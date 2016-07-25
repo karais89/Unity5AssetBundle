@@ -308,30 +308,3 @@ byte 단위이기 때문에 1G를 설정하려면 1 * 1024 * 1024 * 1024를 하�
 가끔가다 재갱신을 해줘야 합니다. 다른 방법으로는 다운받은 에셋 번들을 Filestream등을 이용하여 다시 원하는 경로로 빼는 방법도 있긴 한데.. 전 별로 추천하고 싶지 않네요 ㅎㅎ 어려워서
 
 Caching.CleanNameCache()를 제공하는것이 어떨까 싶네요..ㅠㅠ 무조건 편의라는 모토의 unity3d라도 이런 기능들은 개발자 재량에 조금더 맡겨줬으면 좋겠습니다.
-
-
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
