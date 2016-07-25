@@ -20,6 +20,11 @@ public class AssetBundleManager : MonoBehaviour
                 go.isStatic = true;
                 _instance = go.AddComponent<AssetBundleManager>();
 
+                GameObject go2 = new GameObject("_AssetBundleTimeManager");
+                go2.transform.parent = go.transform;
+                go2.transform.localPosition = Vector3.zero;
+                timeManager = go2.AddComponent<AssetBundleTimeManager>();
+
                 dicAssetBundle = new Dictionary<string, AssetBundleNode>();
                 lstKeyName = new List<string>();
             }
@@ -50,12 +55,12 @@ public class AssetBundleManager : MonoBehaviour
         }
     }
 
+    private static AssetBundleTimeManager timeManager;
     private static Dictionary<string, AssetBundleNode> dicAssetBundle;
-    // save keyName for remove All ABs
-    private static List<string> lstKeyName;
+    private static List<string> lstKeyName; // save keyName for remove All ABs    
 
     // 에셋 번들을 로드하여 Dic에 저장
-    public IEnumerator LoadAssetBundle(string url, int version, bool removeAll)
+    public IEnumerator LoadAssetBundle(string url, int version, bool removeAll, float lifeTime = 0.0f)
     {
         string keyName = MakeKeyName(url, version);
         // 이 부분 주석처리한 이유는 역시나 캐싱은 다운로드시에나 필요한 것이기 때문에..
@@ -83,6 +88,12 @@ public class AssetBundleManager : MonoBehaviour
                     AssetBundleNode node = new AssetBundleNode(url, version, removeAll, www.assetBundle);
                     dicAssetBundle.Add(keyName, node);
                     lstKeyName.Add(keyName);
+
+                    // 로드한 에셋 번들에 생명주기 설정을 원하면 타임 매니저를 통하여 생명주기 설정을 합니다.
+                    if (lifeTime > 0)
+                    {
+                        timeManager.SetLifeTime(keyName, lifeTime);
+                    }
                 }
             }
         }
@@ -120,6 +131,12 @@ public class AssetBundleManager : MonoBehaviour
     {
         if (dicAssetBundle.ContainsKey(keyName))
         {
+            // 생명주기를 가지고 있다면 생명주기도 삭제해줘야 합니다.
+            // 그렇지 않다면 이후에 타임매니저 쪽에서 데이터를 참조했을 때 key error, null 참조 등에 노출됩니다.
+            if(timeManager.IsHaveLife(keyName))
+            {
+                timeManager.RemoveLifeTime(keyName);
+            }
             dicAssetBundle[keyName].UnloadAssetBundle();
             dicAssetBundle.Remove(keyName);
             lstKeyName.Remove(keyName);
@@ -141,5 +158,6 @@ public class AssetBundleManager : MonoBehaviour
         }
         dicAssetBundle.Clear();
         lstKeyName.Clear();
+        timeManager.RemoveAllLifeTime();
     }
 }
