@@ -8,20 +8,32 @@ public class UseEx : MonoBehaviour
 
     IEnumerator Start()
     {
-        // 2초 간의 생명 주기를 가짐
+        // 일단 에셋 번들을 로드합시다.
+        yield return StartCoroutine(AssetBundleManager.Instance.LoadAssetBundle(url, version, false, 2.0f));
+
+        // 중복로드 테스트용으로 같은걸 한번 더 로드해봤는데 걸러냅니다 ~
         yield return StartCoroutine(AssetBundleManager.Instance.LoadAssetBundle(url, version, false, 2.0f));
         
+        // 로드 확인
         Debug.Log(AssetBundleManager.Instance.IsVersionAdded(url, version));
-        Debug.Log(AssetBundleManager.Instance.GetNumberOfABs());
-        AssetBundle ab = AssetBundleManager.Instance.GetAssetBundle(url, version);
-        GameObject gObj = ab.LoadAsset("Cube 1") as GameObject;
-        Instantiate(gObj, Vector3.zero, Quaternion.identity);        
-        GameObject gObj1 = ab.LoadAsset("Cube 2") as GameObject;
-        Instantiate(gObj1, Vector3.zero, Quaternion.identity);
         
-        // 정말 remove 되는지 보기 위하여 에셋 번들 매니저에서 remove 함수를 주석처리
-        //AssetBundleManager.Instance.RemoveAllAssetBundles();
+        // 중복 로드 테스트 확인용 1이 나와야 정상
+        Debug.Log(AssetBundleManager.Instance.GetNumberOfABs());
+        
+        // 일반 로딩으로 cube 1 불러옵니다.
+        AssetBundleManager.Instance.LoadAssetFromAB(url, version, "Cube 1");
 
+        // 비동기로 Cube 2를 불러옵니다.
+        yield return StartCoroutine(AssetBundleManager.Instance.LoadAssetFromABAsync(url, version, "Cube 2"));
+
+        // Cube 1을 리턴받아 한개 생성
+        GameObject gObj1 = AssetBundleManager.Instance.GetLoadedAsset(url, version, "Cube 1") as GameObject;
+        Instantiate(gObj1);
+
+        // Cube 2를 리턴받아 한개 생성
+        GameObject gObj2 = AssetBundleManager.Instance.GetLoadedAsset(url, version, "Cube 2") as GameObject;
+        Instantiate(gObj2);
+        
         // 1초 대기
         yield return new WaitForSeconds(1.0f);
         Debug.Log(AssetBundleManager.Instance.IsVersionAdded(url, version));
